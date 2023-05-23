@@ -30,13 +30,25 @@ def insert_to_measurements_table(sensor_id, value, date_time):
 
 def select_specific_measurements(sensor_id, datetime_1, datetime_2):
     conn = connection.get_connection()
-
     cursor = conn.cursor()
     query = """
             SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id = %s AND date_time
             BETWEEN %s AND %s
             """
     val = (sensor_id, datetime_1, datetime_2)
+    cursor.execute(query, val)
+    results = cursor.fetchall()
+
+    return results
+
+def select_actual_measurements(room_id, limit):
+    conn = connection.get_connection()
+    cursor = conn.cursor()
+    query = """
+                SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id IN 
+                (SELECT id FROM Sensors WHERE room_id = %s) ORDER BY date_time DESC LIMIT %s
+                """
+    val = (room_id, limit)
     cursor.execute(query, val)
     results = cursor.fetchall()
 

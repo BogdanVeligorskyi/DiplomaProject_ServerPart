@@ -9,7 +9,7 @@ import threading
 
 # connection data
 HOST = "192.168.0.115"
-PORT = 50011
+PORT = 50016
 
 # keywords
 IP_ADDR = "IP-ADDRESS"
@@ -22,6 +22,8 @@ GET_SENSORS = "GET_SENSORS"
 SEND_SENSORS = "SEND_SENSORS"
 GET_MEASUREMENTS = "GET_MEASUREMENTS"
 SEND_MEASUREMENTS = "SEND_MEASUREMENTS"
+GET_ACTUAL = "GET_ACTUAL"
+SEND_ACTUAL = "SEND_ACTUAL"
 
 # run  server
 def my_server(step):
@@ -122,6 +124,28 @@ def find_all_measurements_of_sensor(sensor_id, datetime_1, datetime_2):
     measurementsStr += "\n"
     return measurementsStr
 
+# find all sensors of specific room in database
+def find_actual_measurements_of_sensor(room_id, sensors_num):
+    results = measurementsDb.select_actual_measurements(room_id, sensors_num)
+    print("Total rows are ", len(results))
+    if len(results) == 0:
+        return None
+    measurementsStr = SEND_ACTUAL + ":"
+    for row in results:
+        measurementsStr += "id=" + str(row['id']) + ","
+        measurementsStr += "sensor_id=" + str(row['sensor_id']) + ","
+        measurementsStr += "value=" + str(row['value']) + ","
+        measurementsStr += "date_time=" + str(row['date_time']) + ";"
+
+        print("Id: ", row['id'])
+        print("Sensor Id: ", row['sensor_id'])
+        print("Value: ", row['value'])
+        print("Datetime: ", row['date_time'])
+        print("")
+        # list_sensors.append(row['id'])
+    measurementsStr += "\n"
+    return measurementsStr
+
 def client_handler(conn, addr, step):
     with conn:
         print('Connected by ', addr)
@@ -155,6 +179,21 @@ def client_handler(conn, addr, step):
                 datetime_2 = strArr[2]
                 print(sensor_id_str)
                 measurement_str = find_all_measurements_of_sensor(sensor_id, datetime_1+"%", datetime_2+"%")
+                encoded_measurement_str = measurement_str.encode('utf-8')
+                conn.sendall(encoded_measurement_str)
+
+            # if mobile device requests for actual measurements
+            if str(data).startswith(GET_ACTUAL):
+                print("Mobile device requests actual measurements")
+                print("Received: " + str(data))
+                room_id_str = str(data)
+                room_id_str = room_id_str[room_id_str.index(":") + 1:]
+                strArr = room_id_str.split(",")
+                print(room_id_str)
+                room_id = int(strArr[0])
+                sensors_num = int(strArr[1])
+                print(sensors_num)
+                measurement_str = find_actual_measurements_of_sensor(room_id, sensors_num)
                 encoded_measurement_str = measurement_str.encode('utf-8')
                 conn.sendall(encoded_measurement_str)
 
