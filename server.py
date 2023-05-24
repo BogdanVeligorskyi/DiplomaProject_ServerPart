@@ -9,7 +9,7 @@ import threading
 
 # connection data
 HOST = "192.168.0.115"
-PORT = 50016
+PORT = 50020
 
 # keywords
 IP_ADDR = "IP-ADDRESS"
@@ -24,6 +24,7 @@ GET_MEASUREMENTS = "GET_MEASUREMENTS"
 SEND_MEASUREMENTS = "SEND_MEASUREMENTS"
 GET_ACTUAL = "GET_ACTUAL"
 SEND_ACTUAL = "SEND_ACTUAL"
+
 
 # run  server
 def my_server(step):
@@ -115,11 +116,11 @@ def find_all_measurements_of_sensor(sensor_id, datetime_1, datetime_2):
         measurementsStr += "value=" + str(row['value']) + ","
         measurementsStr += "date_time=" + str(row['date_time']) + ";"
 
-        print("Id: ", row['id'])
-        print("Sensor Id: ", row['sensor_id'])
-        print("Value: ", row['value'])
-        print("Datetime: ", row['date_time'])
-        print("")
+        #print("Id: ", row['id'])
+        #print("Sensor Id: ", row['sensor_id'])
+        #print("Value: ", row['value'])
+        #print("Datetime: ", row['date_time'])
+        #print("")
         # list_sensors.append(row['id'])
     measurementsStr += "\n"
     return measurementsStr
@@ -156,15 +157,21 @@ def client_handler(conn, addr, step):
             if str(data).startswith(GET_DEVICES):
                 print("Mobile device requests all devices")
                 rooms_str = find_all_rooms()
-                encoded_room_str = rooms_str.encode('utf-8')
-                conn.sendall(encoded_room_str)
+                if rooms_str is not None:
+                    encoded_room_str = rooms_str.encode('utf-8')
+                    conn.sendall(encoded_room_str)
+                else:
+                    conn.sendall("No devices".encode('utf-8'))
 
             # if mobile device requests for all sensors
             if str(data).startswith(GET_SENSORS):
                 print("Mobile device requests all sensors")
                 sensor_str = find_all_sensors()
-                encoded_sensor_str = sensor_str.encode('utf-8')
-                conn.sendall(encoded_sensor_str)
+                if sensor_str is not None:
+                    encoded_sensor_str = sensor_str.encode('utf-8')
+                    conn.sendall(encoded_sensor_str)
+                else:
+                    conn.sendall("No sensors".encode('utf-8'))
 
             # if mobile device requests for all measurements
             if str(data).startswith(GET_MEASUREMENTS):
@@ -179,8 +186,11 @@ def client_handler(conn, addr, step):
                 datetime_2 = strArr[2]
                 print(sensor_id_str)
                 measurement_str = find_all_measurements_of_sensor(sensor_id, datetime_1+"%", datetime_2+"%")
-                encoded_measurement_str = measurement_str.encode('utf-8')
-                conn.sendall(encoded_measurement_str)
+                if measurement_str is not None:
+                    encoded_measurement_str = measurement_str.encode('utf-8')
+                    conn.sendall(encoded_measurement_str)
+                else:
+                    conn.sendall("No measurements".encode('utf-8'))
 
             # if mobile device requests for actual measurements
             if str(data).startswith(GET_ACTUAL):
@@ -194,8 +204,11 @@ def client_handler(conn, addr, step):
                 sensors_num = int(strArr[1])
                 print(sensors_num)
                 measurement_str = find_actual_measurements_of_sensor(room_id, sensors_num)
-                encoded_measurement_str = measurement_str.encode('utf-8')
-                conn.sendall(encoded_measurement_str)
+                if measurement_str is not None:
+                    encoded_measurement_str = measurement_str.encode('utf-8')
+                    conn.sendall(encoded_measurement_str)
+                else:
+                    conn.sendall("No measurements".encode('utf-8'))
 
             # if IP-ADDRESS received from client
             if str(data).startswith(IP_ADDR):
