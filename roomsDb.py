@@ -53,3 +53,41 @@ def select_all_devices_from_room_table():
     results = cursor.fetchall()
 
     return results
+
+def delete_from_rooms_table(id):
+    conn = connection.get_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+               DELETE FROM Rooms WHERE id = %s
+               """
+        cursor.execute(query, id)
+        conn.commit()
+    finally:
+        conn.close()
+
+
+# update sensor info in sensors table
+def update_in_rooms_table(id, name, width, length, height, square, device_ip, device):
+    conn = connection.get_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+               UPDATE Rooms SET name=%s, width=%s, length=%s, height=%s, square=%s, device_ip=%s, device=%s WHERE id=%s 
+               """
+        val = (name, width, length, height, square, device_ip, device, id)
+        cursor.execute(query, val)
+        conn.commit()
+    finally:
+        conn.close()
+
+def select_all_id_from_rooms_table():
+    conn = connection.get_connection()
+
+    cursor = conn.cursor()
+    query = """
+                SELECT id FROM Rooms 
+                """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    return results

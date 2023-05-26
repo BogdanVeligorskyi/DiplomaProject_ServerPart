@@ -28,6 +28,18 @@ def insert_to_measurements_table(sensor_id, value, date_time):
     cursor.execute(query, val)
     conn.commit()
 
+def select_measurements_from_measurements_table(sensor_id):
+    conn = connection.get_connection()
+    cursor = conn.cursor()
+    query = """
+                SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id = %s
+                """
+    val = (sensor_id)
+    cursor.execute(query, val)
+    results = cursor.fetchall()
+
+    return results
+
 def select_specific_measurements(sensor_id, datetime_1, datetime_2):
     conn = connection.get_connection()
     cursor = conn.cursor()

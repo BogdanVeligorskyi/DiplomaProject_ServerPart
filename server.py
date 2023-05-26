@@ -1,11 +1,9 @@
 import socket
 import datetime
-import string
-
+import threading
 import measurementsDb
 import roomsDb
 import sensorsDb
-import threading
 
 # connection data
 HOST = "192.168.0.115"
@@ -53,7 +51,6 @@ def find_all_rooms():
         print("IP: ", row['device_ip'])
         print("Device: ", row['device'])
         print("")
-        #list_sensors.append(row['id'])
     roomsStr += "\n"
     return roomsStr
 
@@ -184,7 +181,6 @@ def client_handler(conn, addr, step):
                 sensor_id = int(strArr[0])
                 datetime_1 = strArr[1]
                 datetime_2 = strArr[2]
-                print(sensor_id_str)
                 measurement_str = find_all_measurements_of_sensor(sensor_id, datetime_1+"%", datetime_2+"%")
                 if measurement_str is not None:
                     encoded_measurement_str = measurement_str.encode('utf-8')

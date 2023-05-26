@@ -121,7 +121,7 @@ buzzer = init_buzzer()
 DEV_ADDR, adc_channel, bus = init_adc()
 sensor, pin, is_alarm, step_s = read_command_line_params()
 
-# reading temperature, humidity and gas concentration
+# reading temperature, humidity and CO concentration
 # values each 'step_s' seconds
 while 1:
     current_datetime = datetime.datetime.now()
