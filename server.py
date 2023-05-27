@@ -7,7 +7,7 @@ import sensorsDb
 
 # connection data
 HOST = "192.168.0.115"
-PORT = 50020
+PORT = 50028
 
 # keywords
 IP_ADDR = "IP-ADDRESS"
@@ -25,10 +25,11 @@ SEND_ACTUAL = "SEND_ACTUAL"
 
 # run server
 def my_server(step):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        print("Server started to wait for the client")
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        print("Server " + str(HOST) + " started to wait for the client on port " + str(PORT))
         s.bind((HOST, PORT))
-        s.listen()
+        s.listen(1)
         while True:
             conn, addr = s.accept()
             threading.Thread(target=client_handler, args=(conn, addr, step,)).start()
@@ -213,7 +214,7 @@ def client_handler(conn, addr, step):
                     print("No sensors were added in this room!")
                 else:
                     while i <= len(sensors):
-                        print("Measurement {0}: {1}".format(i, list_measurements[i]))
+                        #print("Measurement {0}: {1}".format(i, list_measurements[i]))
                         measurementsDb.insert_to_measurements_table(sensors[i - 1],
                                                                     list_measurements[i],
                                                                     str(datetime.datetime.now().strftime(

@@ -10,7 +10,7 @@ def create_sensors_table():
         (id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
         room_id INTEGER, name VARCHAR(15), measure VARCHAR(20), measure_unit VARCHAR(5), 
         range_min FLOAT, range_max FLOAT,
-        FOREIGN KEY (room_id) REFERENCES Rooms (id)) 
+        FOREIGN KEY (room_id) REFERENCES Rooms (id) ON DELETE CASCADE) 
         """
         cursor.execute(query)
         conn.commit()

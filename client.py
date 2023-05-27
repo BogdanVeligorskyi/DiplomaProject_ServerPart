@@ -2,8 +2,8 @@ import random
 import socket
 import time
 
-HOST = "localhost"
-PORT = 50004
+HOST = "192.168.0.115"
+PORT = 50028
 
 IP_ADDR = "IP-ADDRESS"
 STEP = "STEP"
@@ -15,8 +15,8 @@ def read_measurements_from_sensors():
     lst = [0, 1, 2, 3]
     random.shuffle(lst)
     measurements = ""
-    temperature = lst[0]
-    humidity = lst[1]
+    temperature = lst[0] * 5 + 22
+    humidity = lst[1] * 5 + 22
 
     lst = (temperature, humidity)
     while i < SENSORS_NUM:
@@ -29,10 +29,10 @@ def my_client():
     #threading.Timer(11, my_client).start()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
-        print("Client was connected: IP=192.168.1.116")
-        my = IP_ADDR + ":192.168.1.116"
-        my_inp = my.encode('utf-8')
-        s.sendall(my_inp)
+        print("Client was connected: IP=192.168.0.116")
+        my_ip = IP_ADDR + ":192.168.0.116"
+
+        s.sendall(my_ip.encode('utf-8'))
         data = s.recv(1024).decode('utf-8')
         # якщо отримано ПЕРІОД - передати показники серверу
         while not str(data).startswith("QUIT"):

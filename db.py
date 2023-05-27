@@ -133,6 +133,7 @@ def run_menu():
         elif answer == "11":
             delete_db()
             input("Press Enter to exit (Натисніть Enter для виходу)")
+            os.system('clear')
             exit(0)
         elif answer == "12":
             os.system('clear')

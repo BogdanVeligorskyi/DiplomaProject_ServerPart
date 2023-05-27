@@ -8,7 +8,7 @@ def create_measurements_table():
         query = """
         CREATE TABLE IF NOT EXISTS Measurements (id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
         sensor_id INTEGER, value FLOAT, date_time VARCHAR(20),
-        FOREIGN KEY (sensor_id) REFERENCES Sensors (id)) 
+        FOREIGN KEY (sensor_id) REFERENCES Sensors (id) ON DELETE CASCADE) 
         """
         cursor.execute(query)
         conn.commit()
