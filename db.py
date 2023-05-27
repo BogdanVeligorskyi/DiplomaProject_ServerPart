@@ -1,7 +1,7 @@
-import http.client
 import os
-
 import pymysql
+
+import connection
 import measurementsDb
 import roomsDb
 import sensorsDb
@@ -88,17 +88,18 @@ def run_menu():
             os.system('clear')
             return
         elif answer == "2":
+            print()
             show_rooms()
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "3":
             print()
-            id = input("Enter id of the room (Вкажіть id кімнати): ")
-            show_sensors(id)
+            id_param = input("Enter id of the room (Вкажіть id кімнати): ")
+            show_sensors(id_param)
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "4":
             print()
-            id = input("Enter id of the sensor (Вкажіть id датчика): ")
-            show_measurements(id)
+            id_param = input("Enter id of the sensor (Вкажіть id датчика): ")
+            show_measurements(id_param)
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "5":
             print()
@@ -106,31 +107,32 @@ def run_menu():
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "6":
             print()
-            id = input("Enter id of the room (Вкажіть id кімнати): ")
-            add_sensor(id)
+            id_param = input("Enter id of the room (Вкажіть id кімнати): ")
+            add_sensor(id_param)
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "7":
             print()
-            id = input("Enter id of the room (Вкажіть id кімнати): ")
-            update_room(id)
+            id_param = input("Enter id of the room (Вкажіть id кімнати): ")
+            update_room(id_param)
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "8":
             print()
-            id = input("Enter id of the sensor (Вкажіть id датчика): ")
-            update_sensor(id)
+            id_param = input("Enter id of the sensor (Вкажіть id датчика): ")
+            update_sensor(id_param)
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "9":
             print()
-            id = input("Enter id of the room (Вкажіть id кімнати): ")
-            delete_room(id)
+            id_param = input("Enter id of the room (Вкажіть id кімнати): ")
+            delete_room(id_param)
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "10":
             print()
-            id = input("Enter id of the sensor (Вкажіть id датчика): ")
-            delete_sensor(id)
+            id_param = input("Enter id of the sensor (Вкажіть id датчика): ")
+            delete_sensor(id_param)
             input("Press Enter to continue (Натисніть Enter для продовження)")
         elif answer == "11":
             delete_db()
+            input("Press Enter to exit (Натисніть Enter для виходу)")
             exit(0)
         elif answer == "12":
             os.system('clear')
@@ -150,13 +152,23 @@ def add_room():
     device = input("Enter name of this device (вкажіть назву цього пристрою): ")
     ip_address = input("Enter IP-address of this device (вкажіть ІР-адресу пристрою, який зчитує дані з датчиків): ")
     print()
-    if room != "" and device != "" and ip_address != "" and isfloat(width) and isfloat(length) and isfloat(height) and device != "" and ip_address != "":
-        roomsDb.insert_to_rooms_table(room, float(width), float(length), float(height), float(width) * float(length),
+    if room != "" and device != "" and ip_address != "" and isfloat(width) and isfloat(length) and isfloat(height):
+        room_id = roomsDb.insert_to_rooms_table(room, float(width), float(length), float(height), float(width) * float(length),
                                   ip_address, device)
         print('Room was added successfully! (Кімнату додано успішно!)')
+        print()
+        print("Id: ", str(room_id))
+        print("Name: ", str(room))
+        print("IP: ", str(ip_address))
+        print("Device: ", str(device))
+        print("Width, m: ", str(width))
+        print("Length, m: ", str(length))
+        print("Height, m: ", str(height))
+        print("Square, m2: ", str( float(width)*float(length) ))
+        print("")
     else:
         print('Room wasn`t added! (Кімнату не було додано!)')
-    print()
+        print("")
 
 # add new sensor (?)
 def add_sensor(room_id):
@@ -172,16 +184,25 @@ def add_sensor(room_id):
     sensor_range_min = input("Enter range min of model sensor (Вкажіть мінімальне значення, яке фіксує датчик): ")
     sensor_range_max = input("Enter range max of model sensor (Вкажіть максимальне значення, яке фіксує датчик): ")
     print()
-    if sensor_name != "" and sensor_measure != "" and sensor_unit != "" and isfloat(sensor_range_min) or sensor_range_min.isnumeric() and isfloat(sensor_range_max) or sensor_range_max.isnumeric():
-        sensorsDb.insert_to_sensors_table(room_id, sensor_name, sensor_measure, sensor_unit, float(sensor_range_min), float(sensor_range_max))
+    if sensor_name != "" and sensor_measure != "" and sensor_unit != "" and (isfloat(sensor_range_min) or sensor_range_min.isnumeric()) and (isfloat(sensor_range_max) or sensor_range_max.isnumeric()):
+        sensor_id = sensorsDb.insert_to_sensors_table(room_id, sensor_name, sensor_measure, sensor_unit, float(sensor_range_min), float(sensor_range_max))
         print('Sensor was added successfully! (Датчик додано успішно!)')
+        print()
+        print("Id: ", str(sensor_id))
+        print("Room Id: ", str(room_id))
+        print("Name: ", str(sensor_name))
+        print("Measure: ", str(sensor_measure))
+        print("Measure unit: ", str(sensor_unit))
+        print("Range min: ", str(sensor_range_min))
+        print("Range max: ", str(sensor_range_max))
+        print("")
     else:
         print('Sensor wasn`t added! (Датчик не було додано!)')
-    print("")
+        print("")
 
+# show all rooms
 def show_rooms():
-    results = roomsDb.select_all_devices_from_room_table()
-    print()
+    results = roomsDb.select_all_data_from_rooms_table()
     if len(results) == 0:
         print("No rooms were found (Кімнати не знайдено)!")
         print("")
@@ -190,10 +211,15 @@ def show_rooms():
         print("Name: ", row['name'])
         print("IP: ", row['device_ip'])
         print("Device: ", row['device'])
+        print("Width, m: ", row['width'])
+        print("Length, m: ", row['length'])
+        print("Height, m: ", row['height'])
+        print("Square, m2: ", row['square'])
         print("")
 
-def show_sensors(id):
-    results = sensorsDb.select_specific_sensors_from_sensors_table(id)
+# show all sensors of specific room
+def show_sensors(id_param):
+    results = sensorsDb.select_specific_sensors_from_sensors_table(id_param)
     print()
     if len(results) == 0:
         print("No sensors were found (Датчики не знайдено)!")
@@ -208,8 +234,9 @@ def show_sensors(id):
         print("Range max: ", row['range_max'])
         print("")
 
-def show_measurements(id):
-    results = measurementsDb.select_measurements_from_measurements_table(id)
+# show all measurements of specific sensor
+def show_measurements(id_param):
+    results = measurementsDb.select_specific_measurements_from_measurements_table(id_param)
     print()
     if len(results) == 0:
         print("No measurements were found (Показання не знайдено)!")
@@ -221,56 +248,101 @@ def show_measurements(id):
         print("Datetime: ", row['date_time'])
         print("")
 
-def update_room(id):
+# update specific room
+def update_room(id_param):
+    print()
+    if not check_in_rooms_table(id_param):
+        print('This id isn`t correct (Цей id не існує) !')
+        print()
+        return
     name = input("Enter your room (вкажіть назву кімнати): ")
     width = input("Enter your room width in meters (вкажіть ширину кімнати у метрах): ")
     length = input("Enter your room length in meters (вкажіть довжину кімнати у метрах): ")
     height = input("Enter your room height in meters (вкажіть висоту кімнати у метрах): ")
     ip_address = input("Enter IP-address of this device (вкажіть ІР-адресу пристрою, який зчитує дані з датчиків): ")
     device = input("Enter name of this device (вкажіть назву цього пристрою): ")
-    roomsDb.update_in_rooms_table(id, name, float(width), float(length), float(height), float(width*length), ip_address, device)
-    print('Room was updated successfully! (Кімнату оновлено успішно!)')
+    print()
+    if name != "" and device != "" and ip_address != "" and isfloat(width) and isfloat(length) and isfloat(height):
+        roomsDb.update_in_rooms_table(id_param, name, float(width), float(length), float(height),
+                                                float(width) * float(length),
+                                                ip_address, device)
+        print('Room was updated successfully! (Кімнату оновлено успішно!)')
+        print("")
+        print("Id: ", str(id_param))
+        print("Name: ", str(name))
+        print("IP: ", str(ip_address))
+        print("Device: ", str(device))
+        print("Width, m: ", str(width))
+        print("Length, m: ", str(length))
+        print("Height, m: ", str(height))
+        print("Square, m2: ", str(float(width) * float(length)))
+        print("")
+    else:
+        print('Room wasn`t updated! (Кімнату не було оновлено!)')
+        print("")
 
-
-def update_sensor(id):
+# update specific sensor
+def update_sensor(id_param):
+    print()
+    if not check_in_sensors_table(id_param):
+        print('This id isn`t correct (Цей id не існує) !')
+        print()
+        return
     sensor_name = input("Enter name of model sensor (Вкажіть назву моделі датчика): ")
     sensor_measure = input("Enter measure of model sensor (Вкажіть величину, яку вимірює датчик): ")
     sensor_unit = input("Enter unit measure (Вкажіть позначення одиниці вимірювання): ")
     sensor_range_min = input("Enter range min of model sensor (Вкажіть мінімальне значення, яке фіксує датчик): ")
     sensor_range_max = input("Enter range max of model sensor (Вкажіть максимальне значення, яке фіксує датчик): ")
+    print()
+    if sensor_name != "" and sensor_measure != "" and sensor_unit != "" and (
+            isfloat(sensor_range_min) or sensor_range_min.isnumeric()) and (
+            isfloat(sensor_range_max) or sensor_range_max.isnumeric()):
+        sensorsDb.update_in_sensors_table(id_param, sensor_name, sensor_measure, sensor_unit,
+                                                      float(sensor_range_min), float(sensor_range_max))
+        print('Sensor was updated successfully! (Датчик оновлено успішно!)')
+        print()
+        print("Id: ", str(id_param))
+        print("Name: ", str(sensor_name))
+        print("Measure: ", str(sensor_measure))
+        print("Measure unit: ", str(sensor_unit))
+        print("Range min: ", str(sensor_range_min))
+        print("Range max: ", str(sensor_range_max))
+        print("")
+    else:
+        print('Sensor wasn`t updated! (Датчик не було оновлено!)')
+        print("")
 
-    sensorsDb.update_in_sensors_table(id, sensor_name, sensor_measure, sensor_unit, sensor_range_min, sensor_range_max)
-    print('Sensor was updated successfully! (Датчик оновлено успішно!)')
-
-def delete_room(id):
-    if not check_in_rooms_table(id):
+# delete specific room
+def delete_room(id_param):
+    if not check_in_rooms_table(id_param):
         print('This id isn`t correct (Цей id не існує) !')
         print()
     else:
-        roomsDb.delete_from_rooms_table(id)
+        roomsDb.delete_from_rooms_table(id_param)
         print('Room was deleted successfully (Кімната була видалена успішно)!')
         print()
 
-def delete_sensor(id):
-    if not check_in_sensors_table(id):
+# delete specific sensor
+def delete_sensor(id_param):
+    if not check_in_sensors_table(id_param):
         print('This id isn`t correct (Цей id не існує) !')
         print()
     else:
-        sensorsDb.delete_from_sensors_table(id)
+        sensorsDb.delete_from_sensors_table(id_param)
         print('Sensor was deleted successfully (Датчик був видалений успішно)!')
         print()
 
+# delete all data from database
 def delete_db():
-    try:
-        cursor = conn.cursor()
-        query = """
-                DROP DATABASE 'microclimate_system'
-                """
-        cursor.execute(query)
-        conn.commit()
-    finally:
-        conn.close()
+    conn = connection.get_connection()
+    cursor = conn.cursor()
+    query = """
+            DROP DATABASE microclimate_system
+            """
+    cursor.execute(query)
+    conn.commit()
 
+# check whether entered value is float or not
 def isfloat(num):
     try:
         float(num)
@@ -278,20 +350,22 @@ def isfloat(num):
     except ValueError:
         return False
 
-def check_in_rooms_table(id):
+# check if record with id_param exists in Rooms table
+def check_in_rooms_table(id_param):
     results = roomsDb.select_all_id_from_rooms_table()
     if len(results) == 0:
         return False
     for row in results:
-        if str(id) == str(row['id']):
+        if str(id_param) == str(row['id']):
             return True
     return False
 
-def check_in_sensors_table(id):
+# check if record with id_param exists in Sensors table
+def check_in_sensors_table(id_param):
     results = sensorsDb.select_all_id_from_sensors_table()
     if len(results) == 0:
         return False
     for row in results:
-        if str(id) == str(row['id']):
+        if str(id_param) == str(row['id']):
             return True
     return False

@@ -1,7 +1,6 @@
 import connection
 
-
-# create measurements table
+# create Measurements table
 def create_measurements_table():
     conn = connection.get_connection()
     try:
@@ -16,52 +15,54 @@ def create_measurements_table():
     finally:
         conn.close()
 
-
-# insert measurement from sensor to measurements table
+# insert measurement of sensor to Measurements table
 def insert_to_measurements_table(sensor_id, value, date_time):
     conn = connection.get_connection()
     cursor = conn.cursor()
     query = """
-            INSERT INTO Measurements (sensor_id, value, date_time) VALUES(%s, %s, %s) 
+            INSERT INTO Measurements (sensor_id, value, date_time) 
+            VALUES(%s, %s, %s) 
             """
     val = (sensor_id, value, date_time)
     cursor.execute(query, val)
     conn.commit()
 
-def select_measurements_from_measurements_table(sensor_id):
+# select measurements` data of specific sensor
+def select_specific_measurements_from_measurements_table(sensor_id):
     conn = connection.get_connection()
     cursor = conn.cursor()
     query = """
-                SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id = %s
-                """
-    val = (sensor_id)
+            SELECT id, sensor_id, value, date_time FROM Measurements 
+            WHERE sensor_id = %s
+            """
+    val = sensor_id
     cursor.execute(query, val)
     results = cursor.fetchall()
-
     return results
 
-def select_specific_measurements(sensor_id, datetime_1, datetime_2):
+# select all measurements of sensor from datetime_1 to datetime_2
+def select_measurements_in_interval(sensor_id, datetime_1, datetime_2):
     conn = connection.get_connection()
     cursor = conn.cursor()
     query = """
-            SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id = %s AND date_time
+            SELECT id, sensor_id, value, date_time FROM Measurements 
+            WHERE sensor_id = %s AND date_time
             BETWEEN %s AND %s
             """
     val = (sensor_id, datetime_1, datetime_2)
     cursor.execute(query, val)
     results = cursor.fetchall()
-
     return results
 
+# select actual measurements
 def select_actual_measurements(room_id, limit):
     conn = connection.get_connection()
     cursor = conn.cursor()
     query = """
-                SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id IN 
-                (SELECT id FROM Sensors WHERE room_id = %s) ORDER BY date_time DESC LIMIT %s
-                """
+            SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id IN 
+            (SELECT id FROM Sensors WHERE room_id = %s) ORDER BY date_time DESC LIMIT %s
+            """
     val = (room_id, limit)
     cursor.execute(query, val)
     results = cursor.fetchall()
-
     return results
