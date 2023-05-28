@@ -6,7 +6,8 @@ def create_measurements_table():
     try:
         cursor = conn.cursor()
         query = """
-        CREATE TABLE IF NOT EXISTS Measurements (id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+        CREATE TABLE IF NOT EXISTS Measurements 
+        (id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
         sensor_id INTEGER, value FLOAT, date_time VARCHAR(20),
         FOREIGN KEY (sensor_id) REFERENCES Sensors (id) ON DELETE CASCADE) 
         """
@@ -59,8 +60,10 @@ def select_actual_measurements(room_id, limit):
     conn = connection.get_connection()
     cursor = conn.cursor()
     query = """
-            SELECT id, sensor_id, value, date_time FROM Measurements WHERE sensor_id IN 
-            (SELECT id FROM Sensors WHERE room_id = %s) ORDER BY date_time DESC LIMIT %s
+            SELECT id, sensor_id, value, date_time FROM Measurements 
+            WHERE sensor_id IN 
+            (SELECT id FROM Sensors WHERE room_id = %s) 
+            ORDER BY date_time DESC LIMIT %s
             """
     val = (room_id, limit)
     cursor.execute(query, val)

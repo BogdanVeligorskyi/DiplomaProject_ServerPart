@@ -71,7 +71,8 @@ def select_specific_sensors_from_sensors_table(room_id):
     conn = connection.get_connection()
     cursor = conn.cursor()
     query = """
-            SELECT id, room_id, name, measure, measure_unit, range_min, range_max FROM Sensors 
+            SELECT id, room_id, name, measure, measure_unit, range_min, range_max 
+            FROM Sensors 
             WHERE room_id = %s
             """
     val = room_id

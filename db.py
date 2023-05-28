@@ -1,6 +1,5 @@
 import os
 import pymysql
-
 import connection
 import measurementsDb
 import roomsDb
@@ -11,23 +10,25 @@ conn = pymysql.connect(host='127.0.0.1',
                        password='pwd_9')
 
 # create new database 'microclimate_system'
-def create_db(sensor):
+def create_db(sensor, quick_start):
     try:
         cursor = conn.cursor()
         query = """
                 SELECT SCHEMA_NAME FROM
-                INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'microclimate_system'
+                INFORMATION_SCHEMA.SCHEMATA 
+                WHERE SCHEMA_NAME = 'microclimate_system'
                 """
         cursor.execute(query)
         # if database doesn`t exist - create it
         if cursor.fetchone() is None:
             first_time_init(cursor, sensor)
-        run_menu()
+        run_menu(quick_start)
         conn.commit()
     finally:
         conn.close()
 
-# basic initialization: adding first room and all built-in sensors in Raspberry Pi
+# basic initialization: adding first room and all
+# built-in sensors in Raspberry Pi
 def first_time_init(cursor, sensor):
     query = """
             CREATE DATABASE microclimate_system
@@ -44,8 +45,9 @@ def first_time_init(cursor, sensor):
     height = input("Enter your room height in meters (вкажіть висоту кімнати у метрах): ")
     device = input("Enter name of this device (вкажіть назву цього пристрою): ")
     ip_address = input("Enter IP-address of this device (вкажіть ІР-адресу пристрою, який зчитує дані з датчиків): ")
-    room_id = roomsDb.insert_to_rooms_table(room, float(width), float(length), float(height), float(width) * float(length),
-                                  ip_address, device)
+    room_id = roomsDb.insert_to_rooms_table\
+        (room, float(width), float(length), float(height),
+         float(width) * float(length), ip_address, device)
 
     dht_name = ""
     if sensor==11:
@@ -63,8 +65,11 @@ def first_time_init(cursor, sensor):
     print()
 
 # run menu
-def run_menu():
+def run_menu(quick_start):
     while True:
+        # start system immediately
+        if quick_start == "on":
+            break
         os.system('clear')
         print("-----MICROCLIMATE SYSTEM-----")
         print()
@@ -153,9 +158,11 @@ def add_room():
     device = input("Enter name of this device (вкажіть назву цього пристрою): ")
     ip_address = input("Enter IP-address of this device (вкажіть ІР-адресу пристрою, який зчитує дані з датчиків): ")
     print()
-    if room != "" and device != "" and ip_address != "" and isfloat(width) and isfloat(length) and isfloat(height):
-        room_id = roomsDb.insert_to_rooms_table(room, float(width), float(length), float(height), float(width) * float(length),
-                                  ip_address, device)
+    if room != "" and device != "" and ip_address != "" and isfloat(width) \
+            and isfloat(length) and isfloat(height):
+        room_id = roomsDb.insert_to_rooms_table\
+            (room, float(width), float(length), float(height),
+             float(width) * float(length), ip_address, device)
         print('Room was added successfully! (Кімнату додано успішно!)')
         print()
         print("Id: ", str(room_id))
@@ -185,8 +192,12 @@ def add_sensor(room_id):
     sensor_range_min = input("Enter range min of model sensor (Вкажіть мінімальне значення, яке фіксує датчик): ")
     sensor_range_max = input("Enter range max of model sensor (Вкажіть максимальне значення, яке фіксує датчик): ")
     print()
-    if sensor_name != "" and sensor_measure != "" and sensor_unit != "" and (isfloat(sensor_range_min) or sensor_range_min.isnumeric()) and (isfloat(sensor_range_max) or sensor_range_max.isnumeric()):
-        sensor_id = sensorsDb.insert_to_sensors_table(room_id, sensor_name, sensor_measure, sensor_unit, float(sensor_range_min), float(sensor_range_max))
+    if sensor_name != "" and sensor_measure != "" and sensor_unit != "" \
+            and (isfloat(sensor_range_min) or sensor_range_min.isnumeric()) \
+            and (isfloat(sensor_range_max) or sensor_range_max.isnumeric()):
+        sensor_id = sensorsDb.insert_to_sensors_table\
+            (room_id, sensor_name, sensor_measure, sensor_unit,
+             float(sensor_range_min), float(sensor_range_max))
         print('Sensor was added successfully! (Датчик додано успішно!)')
         print()
         print("Id: ", str(sensor_id))
@@ -237,7 +248,8 @@ def show_sensors(id_param):
 
 # show all measurements of specific sensor
 def show_measurements(id_param):
-    results = measurementsDb.select_specific_measurements_from_measurements_table(id_param)
+    results = measurementsDb.\
+        select_specific_measurements_from_measurements_table(id_param)
     print()
     if len(results) == 0:
         print("No measurements were found (Показання не знайдено)!")
@@ -263,10 +275,12 @@ def update_room(id_param):
     ip_address = input("Enter IP-address of this device (вкажіть ІР-адресу пристрою, який зчитує дані з датчиків): ")
     device = input("Enter name of this device (вкажіть назву цього пристрою): ")
     print()
-    if name != "" and device != "" and ip_address != "" and isfloat(width) and isfloat(length) and isfloat(height):
-        roomsDb.update_in_rooms_table(id_param, name, float(width), float(length), float(height),
-                                                float(width) * float(length),
-                                                ip_address, device)
+    if name != "" and device != "" and ip_address != "" \
+            and isfloat(width) and isfloat(length) and isfloat(height):
+        roomsDb.update_in_rooms_table\
+            (id_param, name, float(width), float(length), float(height),
+             float(width) * float(length),
+             ip_address, device)
         print('Room was updated successfully! (Кімнату оновлено успішно!)')
         print("")
         print("Id: ", str(id_param))
@@ -298,8 +312,9 @@ def update_sensor(id_param):
     if sensor_name != "" and sensor_measure != "" and sensor_unit != "" and (
             isfloat(sensor_range_min) or sensor_range_min.isnumeric()) and (
             isfloat(sensor_range_max) or sensor_range_max.isnumeric()):
-        sensorsDb.update_in_sensors_table(id_param, sensor_name, sensor_measure, sensor_unit,
-                                                      float(sensor_range_min), float(sensor_range_max))
+        sensorsDb.update_in_sensors_table\
+            (id_param, sensor_name, sensor_measure, sensor_unit,
+             float(sensor_range_min), float(sensor_range_max))
         print('Sensor was updated successfully! (Датчик оновлено успішно!)')
         print()
         print("Id: ", str(id_param))

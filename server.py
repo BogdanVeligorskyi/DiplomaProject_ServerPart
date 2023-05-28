@@ -27,7 +27,8 @@ SEND_ACTUAL = "SEND_ACTUAL"
 def my_server(step):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        print("Server " + str(HOST) + " started to wait for the client on port " + str(PORT))
+        print("Server " + str(HOST) + " started to wait for the client on port "
+              + str(PORT))
         s.bind((HOST, PORT))
         s.listen(1)
         while True:
@@ -97,7 +98,8 @@ def find_all_sensors():
 # find all measurements of sensor in specific time interval
 # to send to mobile device
 def find_all_measurements_of_sensor(sensor_id, datetime_1, datetime_2):
-    results = measurementsDb.select_measurements_in_interval(sensor_id, datetime_1, datetime_2)
+    results = measurementsDb.select_measurements_in_interval\
+        (sensor_id, datetime_1, datetime_2)
     print("Total rows are ", len(results))
     if len(results) == 0:
         return None
@@ -166,7 +168,8 @@ def client_handler(conn, addr, step):
                 sensor_id = int(str_arr[0])
                 datetime_1 = str_arr[1]
                 datetime_2 = str_arr[2]
-                measurement_str = find_all_measurements_of_sensor(sensor_id, datetime_1+"%", datetime_2+"%")
+                measurement_str = find_all_measurements_of_sensor\
+                    (sensor_id, datetime_1+"%", datetime_2+"%")
                 if measurement_str is not None:
                     conn.sendall(measurement_str.encode('utf-8'))
                 else:
@@ -215,10 +218,11 @@ def client_handler(conn, addr, step):
                 else:
                     while i <= len(sensors):
                         #print("Measurement {0}: {1}".format(i, list_measurements[i]))
-                        measurementsDb.insert_to_measurements_table(sensors[i - 1],
-                                                                    list_measurements[i],
-                                                                    str(datetime.datetime.now().strftime(
-                                                                        "%d-%m-%Y %H:%M:%S")))
+                        measurementsDb.\
+                            insert_to_measurements_table(sensors[i - 1],
+                                                         list_measurements[i],
+                                                         str(datetime.datetime.now().
+                                                             strftime("%d-%m-%Y %H:%M:%S")))
                         i += 1
 
         conn.close()

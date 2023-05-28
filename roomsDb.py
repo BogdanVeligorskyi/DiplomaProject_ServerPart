@@ -7,7 +7,8 @@ def create_rooms_table():
         cursor = conn.cursor()
         query = """
         CREATE TABLE IF NOT EXISTS Rooms (id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
-        name VARCHAR(20), width FLOAT, length FLOAT, height FLOAT, square FLOAT, device_ip VARCHAR(17), device VARCHAR(20)) 
+        name VARCHAR(20), width FLOAT, length FLOAT, height FLOAT, 
+        square FLOAT, device_ip VARCHAR(17), device VARCHAR(20)) 
         """
         cursor.execute(query)
         conn.commit()

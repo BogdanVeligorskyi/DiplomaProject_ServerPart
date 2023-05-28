@@ -30,11 +30,12 @@ def init_adc():
     return DEV_ADDR, adc_channel, bus
 
 
-# parsing command line parameters.
+# parse command line parameters.
 def read_command_line_params():
     # default time between two measurements, s
     step_s = 10
     is_alarm = "on"
+    quick_start = "off"
     sensor_args = {'DHT11': Adafruit_DHT.DHT11,
                    'DHT22': Adafruit_DHT.DHT22,
                    'DHT2302': Adafruit_DHT.AM2302}
@@ -46,12 +47,20 @@ def read_command_line_params():
     elif len(sys.argv) == 4 and sys.argv[1] in sensor_args:
         sensor = sensor_args[sys.argv[1]]
         pin = sys.argv[2]
-        step_s = (sys.argv[3])
+        step_s = sys.argv[3]
+    # if additional 5th argument was written
     elif len(sys.argv) == 5 and sys.argv[1] in sensor_args:
         sensor = sensor_args[sys.argv[1]]
         pin = sys.argv[2]
         is_alarm = sys.argv[3]
-        step_s = (sys.argv[4])
+        step_s = sys.argv[4]
+        # if additional 5th argument was written
+    elif len(sys.argv) == 6 and sys.argv[1] in sensor_args:
+        sensor = sensor_args[sys.argv[1]]
+        pin = sys.argv[2]
+        is_alarm = sys.argv[3]
+        step_s = sys.argv[4]
+        quick_start = sys.argv[5]
     else:
         print('ENGLISH description:')
         print('Usage: python3 main.py [DHT11|DHT22|DHT2302] <GPIO pin number> <alarm on/off> <step, s>')
@@ -68,10 +77,8 @@ def read_command_line_params():
               'Зчитувати дані кожні ~15 секунд з DHT11, підключеного до GPIO-виводу #4 та увімкнути сигналізацію')
         sys.exit(1)
 
-    db.create_db(sensor)
+    db.create_db(sensor, quick_start)
     threading.Thread(target=server.my_server, args=(step_s,)).start()
-    #server.my_server(step_s)
-
     return sensor, pin, is_alarm, step_s
 
 
@@ -110,7 +117,7 @@ def read_from_mq_135(DEV_ADDR, adc_channel, bus, current_datetime, is_alarm):
          str(current_datetime.strftime("%d-%m-%Y %H:%M:%S")))
 
     # if concentration value is greater than 55 ppm and
-    # turn on alarm
+    # turn on sound alarm
     if value > 55 and is_alarm=='on':
         GPIO.output(buzzer, GPIO.HIGH)
     elif value <= 55 and is_alarm=='on':
@@ -122,7 +129,7 @@ DEV_ADDR, adc_channel, bus = init_adc()
 sensor, pin, is_alarm, step_s = read_command_line_params()
 
 # reading temperature, humidity and CO concentration
-# values each 'step_s' seconds
+# values with interval of 'step_s' seconds
 while 1:
     current_datetime = datetime.datetime.now()
     read_from_dht(sensor, pin, current_datetime)
