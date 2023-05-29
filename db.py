@@ -84,7 +84,8 @@ def run_menu(quick_start):
         print("9. Delete room (Видалити кімнату).")
         print("10. Delete sensor (Видалити датчик).")
         print("11. Delete all data (Видалити всі дані).")
-        print("12. Exit (Закінчити роботу).")
+        print("12. Developer info (Інформація про розробника).")
+        print("13. Exit (Закінчити роботу).")
 
         print()
 
@@ -141,6 +142,10 @@ def run_menu(quick_start):
             os.system('clear')
             exit(0)
         elif answer == "12":
+            print()
+            show_info()
+            input("Press Enter to exit (Натисніть Enter для виходу)")
+        elif answer == "13":
             os.system('clear')
             exit(0)
         else:
@@ -347,6 +352,13 @@ def delete_sensor(id_param):
         sensorsDb.delete_from_sensors_table(id_param)
         print('Sensor was deleted successfully (Датчик був видалений успішно)!')
         print()
+
+# show info about developer
+def show_info():
+    print("Developer: Bogdan Veligorskyi")
+    print("E-mail: bogdan.veligorskyi@gmail.com")
+    print("Chernihiv, Ukraine. 2023")
+    print()
 
 # delete all data from database
 def delete_db():
