@@ -15,3 +15,5 @@ After that, make sure that your network address is static. And, run system by co
 - quickstart option allows us (when on) to simply run the server without entering main menu.
 
 In main menu user can add, edit, delete and see all the components. You just need to type appropriate number to choose your operation.
+
+NOTE: client application shows only last saved measurements if it`s not connected to server.
