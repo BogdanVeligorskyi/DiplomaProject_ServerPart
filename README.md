@@ -4,7 +4,6 @@
 ![alt text](https://github.com/BogdanVeligorskyi/DiplomaProject_ServerPart/blob/main/screens/screen_3.png?raw=true)
 ![alt text](https://github.com/BogdanVeligorskyi/DiplomaProject_ServerPart/blob/main/screens/screen_2.png?raw=true)
 ![alt text](https://github.com/BogdanVeligorskyi/DiplomaProject_ServerPart/blob/main/screens/screen_4.png?raw=true)
-![alt text](https://github.com/BogdanVeligorskyi/DiplomaProject_ServerPart/blob/main/screens/screen_5.png?raw=true)
 
 Application for Raspberry Pi devices which is used for control microclimate monitoring system.
 
